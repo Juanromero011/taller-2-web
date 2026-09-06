@@ -55,7 +55,7 @@ function FormularioSerie({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md mx-auto sm:mx-0">
             <div>
                 <input name="titulo" value={form.titulo} onChange={handleChange} placeholder="Titulo" className="border rounded px-3 py-2 w-full" />
                 {errores.titulo && <span className="text-red-500 text-sm">{errores.titulo}</span>}

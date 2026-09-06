@@ -41,11 +41,11 @@ function DetalleSerieClient({ id }: DetalleSerieClientProps) {
             <p>★ {serie.calificacion}</p>
             {serie.esFavorita && <p>⭐ Favorita</p>}
 
-            <div className="flex gap-3 mt-4">
-                <Link href={`/series/${serie.id}/editar`} className="bg-blue-600 text-white rounded px-4 py-2">
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <Link href={`/series/${serie.id}/editar`} className="bg-blue-600 text-white rounded px-4 py-2 text-center">
                     Editar
                 </Link>
-                <button onClick={handleEliminar} className="bg-red-600 text-white rounded px-4 py-2">
+                <button onClick={handleEliminar} className="bg-red-600 text-white rounded px-4 py-2 text-center">
                     Eliminar
                 </button>
             </div>
