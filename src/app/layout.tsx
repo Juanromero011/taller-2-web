@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { Unbounded } from "next/font/google";
 import { SerieProvider } from "@/context/SerieContext";
 import { Serie } from "@/types/series";
 import "./globals.css";
 
+const unbounded = Unbounded({ subsets: ["latin"] });
+
 export const metadata: Metadata = {
-  title: "Taller 2 - CRUD de Series",
-  description: "Aplicacion de series de television con React y Next.js",
+  title: "Taller 2 - Web",
+  description: "Profe que hace mirando mi metadata JAJAJAJ, mentiras, este es el taller 2 hecho en NEXT",
 };
 
 const seriesIniciales: Serie[] = [
@@ -36,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>
+      <body className={unbounded.className}>
         <SerieProvider seriesIniciales={seriesIniciales}>
           {children}
         </SerieProvider>
