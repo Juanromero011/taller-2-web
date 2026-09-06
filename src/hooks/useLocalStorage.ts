@@ -2,28 +2,34 @@
 import { useState, useEffect } from "react";
 
 function useLocalStorage<T>(key: string, initialValue: T) {
-    const [storedValue, setStoredValue] = useState<T>(() => {
-        if (typeof window === "undefined") return initialValue;
+    const [storedValue, setStoredValue] = useState<T>(initialValue);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
         try {
             const item = localStorage.getItem(key);
-            return item ? (JSON.parse(item) as T) : initialValue;
-        } catch (error) {
-            console.warn(`Error leyendo localStorage key "${key}":`, error);
-            return initialValue;
+            if (item) {
+                setStoredValue(JSON.parse(item) as T);
+            }
+        } catch {
+            setError("No se pudo leer la informacion guardada en este navegador.");
+        } finally {
+            setCargando(false);
         }
-    });
+    }, [key]);
 
-    // Sincroniza con localStorage cada vez que storedValue cambia
     useEffect(() => {
-        if (typeof window === "undefined") return;
+        if (cargando) return;
         try {
             localStorage.setItem(key, JSON.stringify(storedValue));
-        } catch (error) {
-            console.warn(`Error guardando en localStorage key "${key}":`, error);
+            setError(null);
+        } catch {
+            setError("No se pudo guardar la informacion en este navegador.");
         }
-    }, [key, storedValue]);
+    }, [key, storedValue, cargando]);
 
-    return [storedValue, setStoredValue] as const;
+    return [storedValue, setStoredValue, cargando, error] as const;
 }
 
 export default useLocalStorage;

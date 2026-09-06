@@ -6,7 +6,7 @@ import ListaSeries from "@/components/ListaSeries";
 import Link from "next/link";
 
 export default function Home() {
-  const { series } = useSeries();
+  const { series, cargando, error } = useSeries();
   const [busqueda, setBusqueda] = useState("");
 
   const seriesFiltradas = series.filter((serie) =>
@@ -16,13 +16,25 @@ export default function Home() {
   return (
     <main className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Mis Series</h1>
+
+      {error && (
+        <div className="bg-red-950 border border-red-600 text-red-300 rounded px-4 py-2 mb-4">
+          {error}
+        </div>
+      )}
+
       <Link href="/series/nueva" className="inline-block mb-4 bg-blue-600 text-white rounded px-4 py-2">
         + Agregar serie
       </Link>
       <div className="mb-4">
         <Buscador onBuscar={setBusqueda} />
       </div>
-      <ListaSeries series={seriesFiltradas} />
+
+      {cargando ? (
+        <p className="text-gray-400">Cargando series...</p>
+      ) : (
+        <ListaSeries series={seriesFiltradas} />
+      )}
     </main>
   );
 }

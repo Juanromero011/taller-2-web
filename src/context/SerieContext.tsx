@@ -5,6 +5,8 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface SerieContextType {
     series: Serie[];
+    cargando: boolean;
+    error: string | null;
     agregarSerie: (input: SerieInput) => void;
     actualizarSerie: (id: number, input: SerieInput) => void;
     eliminarSerie: (id: number) => void;
@@ -20,7 +22,7 @@ export function SerieProvider({
     seriesIniciales: Serie[];
     children: ReactNode;
 }) {
-    const [series, setSeries] = useLocalStorage<Serie[]>("series", seriesIniciales);
+    const [series, setSeries, cargando, error] = useLocalStorage<Serie[]>("series", seriesIniciales);
 
     const agregarSerie = (input: SerieInput) => {
         const nuevaSerie: Serie = { ...input, id: Date.now(), esFavorita: false };
@@ -47,7 +49,7 @@ export function SerieProvider({
 
     return (
         <SerieContext.Provider
-            value={{ series, agregarSerie, actualizarSerie, eliminarSerie, alternarFavorito }}
+            value={{ series, cargando, error, agregarSerie, actualizarSerie, eliminarSerie, alternarFavorito }}
         >
             {children}
         </SerieContext.Provider>
