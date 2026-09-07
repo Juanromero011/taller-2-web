@@ -14,9 +14,9 @@ export default function NuevaSeriePage() {
     };
 
     return (
-        <main className="max-w-2xl mx-auto p-6">
+        <>
             <h1 className="text-2xl font-bold mb-4">Agregar serie</h1>
             <FormularioSerie onGuardar={handleGuardar} />
-        </main>
+        </>
     );
 }

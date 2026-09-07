@@ -20,13 +20,13 @@ Un proyecto desarrollado con Next.js (App Router), TypeScript y Tailwind CSS par
 
 - **Lista de Series:** Visualización de todas las series guardadas en forma de tarjetas.
 - **Búsqueda:** Buscador en tiempo real para filtrar series por título.
-- **Crear Serie:** Formulario para agregar nuevas series con validaciones (título, género, temporadas, plataforma, calificación).
+- **Crear Serie:** Formulario controlado con validación en tiempo real de los cinco campos (título, género, temporadas, plataforma, calificación).
 - **Detalle de Serie:** Vista dedicada para ver la información completa de una serie.
 - **Editar Serie:** Capacidad para modificar los datos de una serie existente.
 - **Eliminar con Confirmación:** Opción para borrar una serie, previa confirmación por parte del usuario.
 - **Favoritos:** Posibilidad de marcar o desmarcar una serie como favorita.
 - **Persistencia de Datos:** Todos los datos se guardan y recuperan de manera persistente utilizando `localStorage`.
-- **Estados de Carga y Errores:** Manejo adecuado de estados mientras se recupera la información de `localStorage`.
+- **Estados de Carga y Errores:** Skeleton mientras se recupera la información de `localStorage`, y mensajes de error si el navegador bloquea el almacenamiento.
 - **Diseño Responsive:** Interfaz adaptada tanto para dispositivos móviles como para pantallas de escritorio (desktop).
 
 ## Decisiones de Arquitectura
@@ -44,3 +44,13 @@ Un proyecto desarrollado con Next.js (App Router), TypeScript y Tailwind CSS par
    - `SerieInput`: Se utiliza para la creación y edición, contiene solo los campos de negocio que el usuario puede proporcionar (título, género, etc.).
    - `Serie`: Extiende de forma lógica a `SerieInput` añadiendo propiedades que el sistema genera y gestiona internamente, como el `id` (identificador único) y `esFavorita` (estado inicial). 
    Este enfoque garantiza un tipado fuerte de TypeScript (sin uso de `any`) y hace que los formularios solo dependan de la estructura base que necesitan mutar.
+
+4. **Conversión de tipos al guardar el formulario:**
+   Un `<input>` siempre devuelve `string`, incluso con `type="number"`. Como el estado del
+   formulario se actualiza con una clave calculada (`[e.target.name]`), TypeScript no puede
+   verificarla y `temporadas` y `calificacion` terminaban guardándose como texto aunque el
+   tipo dijera `number`. Por eso `handleSubmit` los convierte con `Number()` antes de
+   entregarlos, y así lo que se persiste coincide con el tipo declarado.
+   La función `validar()` se llama en cada render (es pura, no necesita memoización), lo que
+   da la validación en tiempo real; los errores solo se muestran en los campos que el usuario
+   ya visitó (`onBlur`) o después de intentar enviar.

@@ -8,6 +8,8 @@ interface FormularioSerieProps {
     onGuardar: (datos: SerieInput) => void;
 }
 
+type Errores = Partial<Record<keyof SerieInput, string>>;
+
 const valoresPorDefecto: SerieInput = {
     titulo: "",
     genero: "",
@@ -16,65 +18,128 @@ const valoresPorDefecto: SerieInput = {
     calificacion: 5,
 };
 
+function validar(form: SerieInput): Errores {
+    const errores: Errores = {};
+
+    if (!form.titulo.trim()) errores.titulo = "El titulo es obligatorio";
+    if (!form.genero.trim()) errores.genero = "El genero es obligatorio";
+    if (!form.plataforma.trim()) errores.plataforma = "La plataforma es obligatoria";
+
+    const temporadas = Number(form.temporadas);
+    if (!Number.isInteger(temporadas) || temporadas < 1) {
+        errores.temporadas = "Minimo 1 temporada";
+    }
+
+    const calificacion = Number(form.calificacion);
+    if (Number.isNaN(calificacion) || calificacion < 1 || calificacion > 10) {
+        errores.calificacion = "La calificacion debe estar entre 1 y 10";
+    }
+
+    return errores;
+}
+
 function FormularioSerie({
     valoresIniciales,
     textoBoton = "Guardar serie",
     onGuardar,
 }: FormularioSerieProps) {
     const [form, setForm] = useState<SerieInput>(valoresIniciales ?? valoresPorDefecto);
-    const [errores, setErrores] = useState<Partial<Record<keyof SerieInput, string>>>({});
+    const [tocados, setTocados] = useState<Partial<Record<keyof SerieInput, boolean>>>({});
+    const [intentoEnviar, setIntentoEnviar] = useState(false);
+
+    const errores = validar(form);
+
+    const errorDe = (campo: keyof SerieInput) =>
+        tocados[campo] || intentoEnviar ? errores[campo] : undefined;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const validar = (): boolean => {
-        const nuevosErrores: typeof errores = {};
-        if (!form.titulo.trim()) nuevosErrores.titulo = "El titulo es obligatorio";
-        if (!form.genero.trim()) nuevosErrores.genero = "El genero es obligatorio";
-        if (Number(form.temporadas) < 1) nuevosErrores.temporadas = "Minimo 1 temporada";
-        if (Number(form.calificacion) < 1 || Number(form.calificacion) > 10) {
-            nuevosErrores.calificacion = "La calificacion debe estar entre 1 y 10";
-        }
-        setErrores(nuevosErrores);
-        return Object.keys(nuevosErrores).length === 0;
-    };
-
-    const resetFormulario = () => {
-        setForm(valoresPorDefecto);
-        setErrores({});
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        setTocados({ ...tocados, [e.target.name]: true });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validar()) return;
-        onGuardar(form);
+        setIntentoEnviar(true);
+        if (Object.keys(errores).length > 0) return;
+
+        onGuardar({
+            ...form,
+            temporadas: Number(form.temporadas),
+            calificacion: Number(form.calificacion),
+        });
+
         if (!valoresIniciales) {
-            resetFormulario();
+            setForm(valoresPorDefecto);
+            setTocados({});
+            setIntentoEnviar(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md mx-auto sm:mx-0">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 w-full max-w-md">
             <div>
-                <input name="titulo" value={form.titulo} onChange={handleChange} placeholder="Titulo" className="border rounded px-3 py-2 w-full" />
-                {errores.titulo && <span className="text-red-500 text-sm">{errores.titulo}</span>}
+                <label htmlFor="titulo" className="block text-sm mb-1">Titulo</label>
+                <input
+                    id="titulo" name="titulo" value={form.titulo}
+                    onChange={handleChange} onBlur={handleBlur}
+                    aria-invalid={errorDe("titulo") ? true : undefined}
+                    aria-describedby={errorDe("titulo") ? "titulo-error" : undefined}
+                    className="border rounded px-3 py-2 w-full"
+                />
+                {errorDe("titulo") && <span id="titulo-error" className="text-red-500 text-sm">{errorDe("titulo")}</span>}
             </div>
+
             <div>
-                <input name="genero" value={form.genero} onChange={handleChange} placeholder="Genero" className="border rounded px-3 py-2 w-full" />
-                {errores.genero && <span className="text-red-500 text-sm">{errores.genero}</span>}
+                <label htmlFor="genero" className="block text-sm mb-1">Genero</label>
+                <input
+                    id="genero" name="genero" value={form.genero}
+                    onChange={handleChange} onBlur={handleBlur}
+                    aria-invalid={errorDe("genero") ? true : undefined}
+                    aria-describedby={errorDe("genero") ? "genero-error" : undefined}
+                    className="border rounded px-3 py-2 w-full"
+                />
+                {errorDe("genero") && <span id="genero-error" className="text-red-500 text-sm">{errorDe("genero")}</span>}
             </div>
+
             <div>
-                <input name="temporadas" type="number" value={form.temporadas} onChange={handleChange} className="border rounded px-3 py-2 w-full" />
-                {errores.temporadas && <span className="text-red-500 text-sm">{errores.temporadas}</span>}
+                <label htmlFor="plataforma" className="block text-sm mb-1">Plataforma</label>
+                <input
+                    id="plataforma" name="plataforma" value={form.plataforma}
+                    onChange={handleChange} onBlur={handleBlur}
+                    aria-invalid={errorDe("plataforma") ? true : undefined}
+                    aria-describedby={errorDe("plataforma") ? "plataforma-error" : undefined}
+                    className="border rounded px-3 py-2 w-full"
+                />
+                {errorDe("plataforma") && <span id="plataforma-error" className="text-red-500 text-sm">{errorDe("plataforma")}</span>}
             </div>
+
             <div>
-                <input name="plataforma" value={form.plataforma} onChange={handleChange} placeholder="Plataforma" className="border rounded px-3 py-2 w-full" />
+                <label htmlFor="temporadas" className="block text-sm mb-1">Temporadas</label>
+                <input
+                    id="temporadas" name="temporadas" type="number" min="1" value={form.temporadas}
+                    onChange={handleChange} onBlur={handleBlur}
+                    aria-invalid={errorDe("temporadas") ? true : undefined}
+                    aria-describedby={errorDe("temporadas") ? "temporadas-error" : undefined}
+                    className="border rounded px-3 py-2 w-full"
+                />
+                {errorDe("temporadas") && <span id="temporadas-error" className="text-red-500 text-sm">{errorDe("temporadas")}</span>}
             </div>
+
             <div>
-                <input name="calificacion" type="number" step="0.1" value={form.calificacion} onChange={handleChange} className="border rounded px-3 py-2 w-full" />
-                {errores.calificacion && <span className="text-red-500 text-sm">{errores.calificacion}</span>}
+                <label htmlFor="calificacion" className="block text-sm mb-1">Calificacion (1 a 10)</label>
+                <input
+                    id="calificacion" name="calificacion" type="number" step="0.1" min="1" max="10" value={form.calificacion}
+                    onChange={handleChange} onBlur={handleBlur}
+                    aria-invalid={errorDe("calificacion") ? true : undefined}
+                    aria-describedby={errorDe("calificacion") ? "calificacion-error" : undefined}
+                    className="border rounded px-3 py-2 w-full"
+                />
+                {errorDe("calificacion") && <span id="calificacion-error" className="text-red-500 text-sm">{errorDe("calificacion")}</span>}
             </div>
+
             <button type="submit" className="bg-blue-600 text-white rounded px-4 py-2">
                 {textoBoton}
             </button>

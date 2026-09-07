@@ -11,15 +11,19 @@ interface EditarSerieClientProps {
 
 function EditarSerieClient({ id }: EditarSerieClientProps) {
     const router = useRouter();
-    const { series, actualizarSerie } = useSeries();
+    const { series, cargando, actualizarSerie } = useSeries();
     const serie = series.find((s) => s.id === Number(id));
+
+    if (cargando) {
+        return <p className="text-gray-400">Cargando...</p>;
+    }
 
     if (!serie) {
         return (
-            <main className="max-w-2xl mx-auto p-6">
+            <>
                 <p>No se encontro la serie.</p>
                 <Link href="/" className="text-blue-600 underline">Volver</Link>
-            </main>
+            </>
         );
     }
 
@@ -29,7 +33,7 @@ function EditarSerieClient({ id }: EditarSerieClientProps) {
     };
 
     return (
-        <main className="max-w-2xl mx-auto p-6">
+        <>
             <h1 className="text-2xl font-bold mb-4">Editar serie</h1>
             <FormularioSerie
                 valoresIniciales={{
@@ -42,7 +46,7 @@ function EditarSerieClient({ id }: EditarSerieClientProps) {
                 textoBoton="Guardar cambios"
                 onGuardar={handleGuardar}
             />
-        </main>
+        </>
     );
 }
 

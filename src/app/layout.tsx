@@ -42,10 +42,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={unbounded.className}>
+      <body className={`${unbounded.className} flex min-h-screen flex-col`}>
         <SerieProvider seriesIniciales={seriesIniciales}>
           <Header />
-          <main>{children}</main>
+          <main className="max-w-2xl mx-auto w-full flex-1 p-6">{children}</main>
           <Footer />
         </SerieProvider>
       </body>

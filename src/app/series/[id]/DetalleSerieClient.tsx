@@ -3,21 +3,26 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSeries } from "@/context/SerieContext";
 import BotonFavorito from "@/components/BotonFavorito";
+
 interface DetalleSerieClientProps {
     id: string;
 }
 
 function DetalleSerieClient({ id }: DetalleSerieClientProps) {
     const router = useRouter();
-    const { series, eliminarSerie } = useSeries();
+    const { series, cargando, eliminarSerie } = useSeries();
     const serie = series.find((s) => s.id === Number(id));
+
+    if (cargando) {
+        return <p className="text-gray-400">Cargando...</p>;
+    }
 
     if (!serie) {
         return (
-            <main className="max-w-2xl mx-auto p-6">
+            <>
                 <p>No se encontro la serie.</p>
                 <Link href="/" className="text-blue-600 underline">Volver</Link>
-            </main>
+            </>
         );
     }
 
@@ -29,13 +34,13 @@ function DetalleSerieClient({ id }: DetalleSerieClientProps) {
     };
 
     return (
-        <main className="max-w-2xl mx-auto p-6">
+        <>
             <Link href="/" className="text-blue-600 underline">← Volver</Link>
             <h1 className="text-2xl font-bold mt-4 flex items-center gap-2">
                 {serie.titulo}
                 <BotonFavorito serieId={serie.id} esFavorita={serie.esFavorita} />
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
                 {serie.genero} · {serie.temporadas} temporadas · {serie.plataforma}
             </p>
             <p>★ {serie.calificacion}</p>
@@ -49,7 +54,7 @@ function DetalleSerieClient({ id }: DetalleSerieClientProps) {
                     Eliminar
                 </button>
             </div>
-        </main>
+        </>
     );
 }
 

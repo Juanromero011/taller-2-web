@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSeries } from "@/context/SerieContext";
 import Buscador from "@/components/Buscador";
 import ListaSeries from "@/components/ListaSeries";
+import EsqueletoLista from "@/components/EsqueletoLista";
 import Link from "next/link";
 
 export default function Home() {
@@ -14,7 +15,7 @@ export default function Home() {
   );
 
   return (
-    <main className="max-w-2xl mx-auto p-6">
+    <>
       <h1 className="text-2xl font-bold mb-4">Mis Series</h1>
 
       {error && (
@@ -30,11 +31,7 @@ export default function Home() {
         <Buscador onBuscar={setBusqueda} />
       </div>
 
-      {cargando ? (
-        <p className="text-gray-400">Cargando series...</p>
-      ) : (
-        <ListaSeries series={seriesFiltradas} />
-      )}
-    </main>
+      {cargando ? <EsqueletoLista /> : <ListaSeries series={seriesFiltradas} />}
+    </>
   );
 }
