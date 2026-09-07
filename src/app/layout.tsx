@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Unbounded } from "next/font/google";
 import { SerieProvider } from "@/context/SerieContext";
 import { Serie } from "@/types/series";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+
 import "./globals.css";
 
 const unbounded = Unbounded({ subsets: ["latin"] });
@@ -41,7 +44,9 @@ export default function RootLayout({
     <html lang="es">
       <body className={unbounded.className}>
         <SerieProvider seriesIniciales={seriesIniciales}>
-          {children}
+          <Header />
+          <main>{children}</main>
+          <Footer />
         </SerieProvider>
       </body>
     </html>
